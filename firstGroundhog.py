@@ -26,7 +26,6 @@ all_groundhogs["lon"] = pd.to_numeric(split[1], errors="coerce")
 with st.container(border = True):
     selected_labels = st.multiselect('"Groundhogs"', all_labels, default = all_labels[:1])        
     
-rolling_average = st.toggle("Rolling average")
 
 
 
@@ -39,14 +38,19 @@ if selected_labels:
     data.columns = [slug_to_name.get(col, col) for col in data.columns]
 
 
-    if rolling_average:
-        window = st.slider("Rolling window (years)", min_value=2, max_value= 10, value=5)
-        data = data.rolling(window).mean()
-        data = data.dropna(how='all')
+  
 
     map_filtered = all_groundhogs[all_groundhogs['slug'].isin(selected_slugs)]
 
     st.map(map_filtered)
+
+    rolling_average = st.toggle("Rolling average")
+
+
+    if rolling_average:
+        window = st.slider("Rolling window (years)", min_value=2, max_value= 10, value=5)
+        data = data.rolling(window).mean()
+        data = data.dropna(how='all')
 
     tab1, tab2 = st.tabs(["Chart", "Dataframe"])
     tab1.line_chart(data, height=250)
