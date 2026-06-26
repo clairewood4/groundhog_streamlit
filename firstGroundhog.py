@@ -11,15 +11,24 @@ df['Name_Category'] = df['name'] + ', ' + df['Category'] + "/" + df['type']
 
 st.write("This is a litte bit of groundhog data.")
 
-all_groundhogs = df[['Name_Category', 'Category', 'slug']].drop_duplicates(subset='Name_Category')
+all_groundhogs = df[['Name_Category', 'Category', 'slug', 'coordinates']].drop_duplicates(subset='Name_Category')
 
 name_to_slug = dict(zip(all_groundhogs['Name_Category'], all_groundhogs['slug']))
 all_labels = all_groundhogs['Name_Category'].tolist()
+
+split = all_groundhogs["coordinates"].str.split(r',|, ',expand=True)
+
+all_groundhogs["lat"] = pd.to_numeric(split[0], errors="coerce")
+all_groundhogs["lon"] = pd.to_numeric(split[1], errors="coerce")
+
+
+st.write(all_groundhogs.head(5))
 
 with st.container(border = True):
     selected_labels = st.multiselect('"Groundhogs"', all_labels, default = all_labels[:1])        
     
 rolling_average = st.toggle("Rolling average")
+
 
 
 if selected_labels:
@@ -36,9 +45,19 @@ if selected_labels:
         data = data.rolling(window).mean()
         data = data.dropna(how='all')
 
+    map_filtered = all_groundhogs[all_groundhogs['slug'].isin(selected_slugs)]
+
+    st.map(map_filtered)
 
     tab1, tab2 = st.tabs(["Chart", "Dataframe"])
     tab1.line_chart(data, height=250)
-    tab2.dataframe(data,height=250, use_container_width=True)
+    tab2.dataframe(data,height=250, width=True)
+
+
 else:
     st.info('Select at least one "groundhog" to see data.')
+
+
+
+
+
