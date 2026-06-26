@@ -22,7 +22,6 @@ all_groundhogs["lat"] = pd.to_numeric(split[0], errors="coerce")
 all_groundhogs["lon"] = pd.to_numeric(split[1], errors="coerce")
 
 
-st.write(all_groundhogs.head(5))
 
 with st.container(border = True):
     selected_labels = st.multiselect('"Groundhogs"', all_labels, default = all_labels[:1])        
